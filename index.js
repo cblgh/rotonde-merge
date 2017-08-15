@@ -48,7 +48,7 @@ function processJson(key, contents) {
     var attributes = {}
 
     // update the in-memory origin file
-    merge(origin, remote)
+    merge(origin, posts, attributes)
 }
 
 async function getOrigin(origin) {
