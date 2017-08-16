@@ -75,6 +75,7 @@ path.stat(statePath).catch(function(err) {
 .catch(function(err) {
     console.log("no origin file")
     console.log(err)
+    process.exit()
 }).then(function() {
     files.map(function(file) {
         if (file.indexOf("dat://") >= 0) {
