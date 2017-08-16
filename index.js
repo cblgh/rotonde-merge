@@ -4,7 +4,7 @@ var hyperdrive = require("hyperdrive")
 var request = require("request")
 
 // TODO: add dat://<key>
-var files = ["http://test-cblgh.hashbase.io", "/Users/cblgh/code/rotonde-merge/rotonde1.json"]
+var files = ["https://test-cblgh.hashbase.io", "/Users/cblgh/code/rotonde-merge/rotonde1.json"]
 var originPath = "./rotonde.json"
 var statePath = "./state.json"
 // the in-memory representation of the merged rotonde.json
@@ -58,7 +58,6 @@ path.stat(statePath).catch(function(err) {
 })
 .then(function(stateData) {
     savedState = stateData
-    console.log(stateData)
     return getJSON(originPath)
 })
 .then(function(originData) {
@@ -76,9 +75,19 @@ path.stat(statePath).catch(function(err) {
             // return processJSON(file, jsonFile)
         } else if (file.indexOf("http://") >= 0 || file.indexOf("https://") >= 0) { // REPLACE WITH url.isURL? REGEX?
             console.log("http(s)")
-            request(file, function(data) {
-                // var data = JSON.parse(data)
-                // return processJSON(file, data)
+            request(file, function(err, resp, data) {
+                if (err) {
+                    console.error(err)
+                    process.exit()
+                }
+                try {
+                    var data = JSON.parse(data)
+                } catch (err) {
+                    console.log("was probably already javascript")
+                    console.log(err)
+                } finally {
+                    return processJSON(file, data)
+                }
             })
         } else {
             console.log("local file")
@@ -102,13 +111,9 @@ path.stat(statePath).catch(function(err) {
 // CALLBACK THAT HANDLES A JSON FILE, GETTING ITS ROTONDE CONTENTS
 function processJSON(key, contents) {
     return new Promise(function(resolve, reject) {
-        console.log("origin", origin)
         if (!savedState[key]) { 
             savedState[key] = defaultState()
         }
-        console.log(key)
-        console.log(contents.profile)
-        console.log(key in savedState)
         // get the last known state for this file
         var state = savedState[key]
         
