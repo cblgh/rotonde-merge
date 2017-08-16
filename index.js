@@ -4,12 +4,11 @@ var hyperdrive = require("hyperdrive")
 var request = require("request")
 
 // TODO: add support for dat://<key>
-var files = ["https://test-cblgh.hashbase.io", "/Users/cblgh/code/rotonde-merge/rotonde1.json"]
-var originPath = "./rotonde.json"
-var statePath = "./state.json"
+var files = ["https://test-cblgh.hashbase.io", "/home/cblgh/code/rotonde-cli/rotonde.json"]
+var originPath = "/home/cblgh/code/rotonde-merge/rotonde.json"
+var statePath = "/home/cblgh/code/rotonde-merge/state.json"
 // the in-memory representation of the merged rotonde.json
 var origin
-
 // savedState's where we keep track of the various file states
 // savedState[key] => state, where key === string(files[i])
 // read the origin file, the one we merge into
@@ -124,7 +123,7 @@ function processJSON(key, contents) {
                 console.log("%s vs %s", saved_profile[attr], current_profile[attr])
                 console.log("the saved profile's %s is different from the current profile", attr)
                 console.log("update origin with the newest change")
-                origin[attr] = current_profile[attr]
+                origin.profile[attr] = current_profile[attr]
             }
         }
         // save the current profile
