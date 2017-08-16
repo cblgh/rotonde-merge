@@ -1,0 +1,28 @@
+{
+  "name": "rotonde-merge",
+  "version": "1.0.0",
+  "description": "merges rotonde files into a single json",
+  "main": "index.js",
+  "dependencies": {
+    "hyperdrive": "^9.5.1",
+    "mz": "^2.6.0",
+    "request": "^2.81.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cblgh/rotonde-merge.git"
+  },
+  "keywords": [
+    "rotonde"
+  ],
+  "author": "cblgh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cblgh/rotonde-merge/issues"
+  },
+  "homepage": "https://github.com/cblgh/rotonde-merge#readme"
+}
