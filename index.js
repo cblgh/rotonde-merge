@@ -3,36 +3,37 @@ var hyperdrive = require("hyperdrive")
 
 var files = ["dat://KEY", "/path/to/file"]
 var originPath = "./rotonde.json"
+var statePath = "./state.json"
+
+// read the origin file, the one we merge into
+var origin = await getJSON(originPath)
 
 // here's where we keep track of the state per file in the files list
 // savedState[key] => state, where key === string(files[i])
-var savedState = {}
+var savedState = await getJSON(statePath)
 
-// read the origin file, the one we merge into
-var origin = await getOrigin(originPath)
-
-files.map(function(file) {
-    var jsonFile
-    if (file.indexOf("dat://") >= 0) {
-        // fetch dat stuff
-        var archive = hyperdrive(file) // IS THIS RIGHT?? IDK
-        processJson(file, jsonFile)
-    } else if (file.indexOf("http://") >= 0) { // REPLACE WITH IS URL? REGEX?
-        // fetch json
-        processJson(file, jsonFile)
-    } else {
-        // ASSUME IT IS A FILE ON THE HARD DRIVE
-        // check to make sure it exists
-        fs.readFile(file, function(err, data) {
-            if (err) {
-                console.error(err)
-                process.exit()
-            }
-            jsonFile = JSON.parse(data)
-            processJson(file, jsonFile)
-        })
-    }
-})
+// files.map(function(file) {
+//     var jsonFile
+//     if (file.indexOf("dat://") >= 0) {
+//         // fetch dat stuff
+//         var archive = hyperdrive(file) // IS THIS RIGHT?? IDK
+//         processJson(file, jsonFile)
+//     } else if (file.indexOf("http://") >= 0) { // REPLACE WITH IS URL? REGEX?
+//         // fetch json
+//         processJson(file, jsonFile)
+//     } else {
+//         // ASSUME IT IS A FILE ON THE HARD DRIVE
+//         // check to make sure it exists
+//         fs.readFile(file, function(err, data) {
+//             if (err) {
+//                 console.error(err)
+//                 process.exit()
+//             }
+//             jsonFile = JSON.parse(data)
+//             processJson(file, jsonFile)
+//         })
+//     }
+// })
 
 // CALLBACK THAT HANDLES A JSON FILE, GETTING ITS ROTONDE CONTENTS
 function processJson(key, contents) {
@@ -51,9 +52,9 @@ function processJson(key, contents) {
     merge(origin, posts, attributes)
 }
 
-async function getOrigin(origin) {
+async function getJSON(filepath) {
     return new Promise(function(resolve, reject) {
-        fs.readFile(origin, function(err, data) {
+        fs.readFile(filepath, function(err, data) {
             if (err) {
                 console.error(err)
                 reject(err)
