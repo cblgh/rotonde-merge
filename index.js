@@ -53,7 +53,6 @@ function defaultState() {
             avatar: ""
         },
         portal: []
-        // TODO: add portals
     }
 }
 
@@ -148,13 +147,12 @@ function processJSON(key, contents) {
                 origin.feed.push(post)
             }
         })
-
         // update timestamp of newest post
         if (posts.length > 0) {
             state.lastTimestamp = posts[posts.length - 1].time 
         }
 
-        var portals = updatePortals(state, contents.portal)
+        var portals = getPortalChanges(state, contents.portal)
         // remove the unfollowed portals
         portals.removed.forEach(function(portal) {
             var index = origin.portal.indexOf(portal)
@@ -178,7 +176,7 @@ function processJSON(key, contents) {
 }
 
 // TODO: rewrite this part with functional javascript i.e. filter or something more apt
-function updatePortals(state, currentPortals) {
+function getPortalChanges(state, currentPortals) {
     var portals = {removed: [], added: []}
     var removed = []
     state.portal.map(function(portal) {
@@ -206,6 +204,7 @@ function updatePortals(state, currentPortals) {
     return portals
 }
 
+// save the state data and the merged json file
 function save() {
     return new Promise(function(resolve, reject) {
         saveJSON(savedState, statePath)
@@ -235,6 +234,7 @@ function compare(a, b) {
     return 0
 }
 
+// save a JSON file
 function saveJSON(data, filepath) {
     return new Promise(function(resolve, reject) {
         fs.writeFile(filepath, JSON.stringify(data), function(err) {
@@ -247,6 +247,7 @@ function saveJSON(data, filepath) {
     })
 }
 
+// read a file and return it as JSON
 function getJSON(filepath) {
     return new Promise(function(resolve, reject) {
         fs.readFile(filepath)
@@ -259,6 +260,7 @@ function getJSON(filepath) {
     })
 }
 
+// get the posts that have been added, and sort the chronologically
 function getNewPosts(timestamp, posts) {
     timestamp = parseInt(timestamp)
     var newPosts = []
