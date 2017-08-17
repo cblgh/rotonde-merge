@@ -2,25 +2,27 @@ var fs = require("mz/fs")
 var path = require("mz/fs")
 var hyperdrive = require("hyperdrive")
 var request = require("request")
+var config = require("./config.js")
 
-// TODO: add support for dat://<key>
-var files = ["https://test-cblgh.hashbase.io", "/home/cblgh/code/rotonde-cli/rotonde.json"]
-var originPath = "/srv/node/rotonde/public/rotonde.json"
-var statePath = "/home/cblgh/code/rotonde-merge/state.json"
+// TODO: 
+// * add support for dat://<key> in config.files
+// * refactor to use functional patterns
+// * refactor to allow for relative paths, urls without http://
+
 // the in-memory representation of the merged rotonde.json
 var origin
 // savedState's where we keep track of the various file states
 // savedState[key] => state, where key === string(files[i])
 // read the origin file, the one we merge into
 var savedState
-
-function createStateFile() {
+console.log(config)
+function createStateFile(filepath) {
     return new Promise(function(resolve, reject) {
         var state = {}
-        files.map(function(file) {
+        config.files.map(function(file) {
             state[file] = defaultState()
         })
-        fs.writeFile(statePath, JSON.stringify(state), function(err) {
+        fs.writeFile(filepath, JSON.stringify(state), function(err) {
             if (err) {
                 reject(err)
                 console.error(err)
@@ -38,8 +40,6 @@ function createStateFile() {
      * if any attribute in portal.profile has changed (remote.current_profile.attrib != remote.previous_profile.attrib=
        then update the corresponding attribute for origin. 
        once all attributes have been checked: set remote.previous_profile = remote.current_profile
-    TODO: add support for portal-array
-
 */
 function defaultState() {
     return {
@@ -55,26 +55,21 @@ function defaultState() {
     }
 }
 
-getJSON("./config.json").then(function(config) {
-    console.log(config)
-    statePath = config.state
-    originPath = config.origin
-    files = config.files
-})
+console.log(config)
 
-path.stat(statePath).catch(function(err) {
-    return createStateFile()
+path.stat(config.statePath).catch(function(err) {
+    return createStateFile(config.statePath)
 })
 .catch(function(err) {
     console.log("creating state file failed")
     console.error(err)
 })
 .then(function() {
-    return getJSON(statePath)
+    return getJSON(config.statePath)
 })
 .then(function(stateData) {
     savedState = stateData
-    return getJSON(originPath)
+    return getJSON(config.originPath)
 })
 .then(function(originData) {
     origin = originData
@@ -84,7 +79,7 @@ path.stat(statePath).catch(function(err) {
     console.log(err)
     process.exit()
 }).then(function() {
-    files.map(function(file) {
+    config.files.map(function(file) {
         if (file.indexOf("dat://") >= 0) {
             console.log("TODO: dat")
             // fetch dat stuff
@@ -214,13 +209,13 @@ function getPortalChanges(state, currentPortals) {
 // save the state data and the merged json file
 function save() {
     return new Promise(function(resolve, reject) {
-        saveJSON(savedState, statePath)
+        saveJSON(savedState, config.statePath)
         .catch(function(err) {
             console.error("err when saving state in processJSON")
             reject()
         })
         .then(function() {
-            return saveJSON(origin, originPath)
+            return saveJSON(origin, config.originPath)
         })
         .catch(function(err) {
             console.error("err when saving origin in processJSON")
