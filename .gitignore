@@ -6,6 +6,7 @@ node_modules/
 /html/*.html
 *.swo
 config.conf
+config.json
 config.js
 *.txt
 words.db/
