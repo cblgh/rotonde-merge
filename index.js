@@ -18,7 +18,7 @@ var savedState
 function createStateFile(filepath) {
     return new Promise(function(resolve, reject) {
         var state = {}
-        config.files.map(function(file) {
+        config.files.forEach(function(file) {
             state[file] = defaultState()
         })
         fs.writeFile(filepath, JSON.stringify(state), function(err) {
@@ -76,7 +76,7 @@ path.stat(config.statePath).catch(function(err) {
     console.log(err)
     process.exit()
 }).then(function() {
-    config.files.map(function(file) {
+    config.files.forEach(function(file) {
         if (file.indexOf("dat://") >= 0) {
             console.log("TODO: dat")
             // fetch dat stuff
@@ -131,7 +131,7 @@ function processJSON(key, contents) {
 
         // get any new posts
         var posts = getNewPosts(state.lastTimestamp, contents.feed)
-        posts.map(function(post) {
+        posts.forEach(function(post) {
             var dupe = false
             // make sure one of the new posts doesn't already exist yet
             // (switch to using hash if that's added to spec)
@@ -178,7 +178,7 @@ function processJSON(key, contents) {
 function getPortalChanges(state, currentPortals) {
     var portals = {removed: [], added: []}
     var removed = []
-    state.portal.map(function(portal) {
+    state.portal.forEach(function(portal) {
         // portal has been removed if it was in state.portal yet isn't in currentPortals
         var index = currentPortals.indexOf(portal)
         if (index < 0) {
@@ -192,7 +192,7 @@ function getPortalChanges(state, currentPortals) {
         state.portal.splice(index, 1)
     }
     // portal has been added if it isn't in state.portal, but is in currentPortals
-    currentPortals.map(function(portal) {
+    currentPortals.forEach(function(portal) {
         // portal has been removed if it was in state.portal yet isn't in currentPortals
         var index = state.portal.indexOf(portal)
         if (index < 0) {
