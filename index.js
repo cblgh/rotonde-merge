@@ -15,7 +15,6 @@ var origin
 // savedState[key] => state, where key === string(files[i])
 // read the origin file, the one we merge into
 var savedState
-console.log(config)
 function createStateFile(filepath) {
     return new Promise(function(resolve, reject) {
         var state = {}
