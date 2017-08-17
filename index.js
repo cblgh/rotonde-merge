@@ -55,8 +55,6 @@ function defaultState() {
     }
 }
 
-console.log(config)
-
 path.stat(config.statePath).catch(function(err) {
     return createStateFile(config.statePath)
 })
@@ -140,7 +138,7 @@ function processJSON(key, contents) {
             // (switch to using hash if that's added to spec)
             for (var i = 0; i < origin.feed.length; i++) {
                 var originPost = origin.feed[i]
-                if (parseInt(originPost.time) === post.time) {
+                if (parseInt(originPost.time) === parseInt(post.time)) {
                     dupe = true
                     break
                 }
@@ -151,7 +149,7 @@ function processJSON(key, contents) {
         })
         // update timestamp of newest post
         if (posts.length > 0) {
-            state.lastTimestamp = posts[posts.length - 1].time 
+            state.lastTimestamp = parseInt(posts[posts.length - 1].time)
         }
 
         var portals = getPortalChanges(state, contents.portal)
