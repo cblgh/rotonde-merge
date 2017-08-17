@@ -5,7 +5,7 @@ var request = require("request")
 
 // TODO: add support for dat://<key>
 var files = ["https://test-cblgh.hashbase.io", "/home/cblgh/code/rotonde-cli/rotonde.json"]
-var originPath = "/home/cblgh/code/rotonde-merge/rotonde.json"
+var originPath = "/srv/node/rotonde/public/rotonde.json"
 var statePath = "/home/cblgh/code/rotonde-merge/state.json"
 // the in-memory representation of the merged rotonde.json
 var origin
@@ -54,6 +54,13 @@ function defaultState() {
         portal: []
     }
 }
+
+getJSON("./config.json").then(function(config) {
+    console.log(config)
+    statePath = config.state
+    originPath = config.origin
+    files = config.files
+})
 
 path.stat(statePath).catch(function(err) {
     return createStateFile()
