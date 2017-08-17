@@ -82,7 +82,7 @@ path.stat(config.statePath).catch(function(err) {
             // fetch dat stuff
             // var archive = hyperdrive(file) // IS THIS RIGHT?? IDK
             // return processJSON(file, jsonFile)
-        } else if (file.indexOf("http://") >= 0 || file.indexOf("https://") >= 0) { // REPLACE WITH url.isURL? REGEX?
+        } else if (file.indexOf("http://") >= 0 || file.indexOf("https://") >= 0) { 
             console.log("http(s)")
             request(file, function(err, resp, data) {
                 if (err) {
@@ -92,7 +92,7 @@ path.stat(config.statePath).catch(function(err) {
                 try {
                     var data = JSON.parse(data)
                 } catch (err) {
-                    console.log("was probably already javascript")
+                    console.log("%s was probably already javascript", file)
                     console.log(err)
                 } finally {
                     return processJSON(file, data)
@@ -162,6 +162,7 @@ function processJSON(key, contents) {
         })
         // follow the added portals
         portals.added.forEach(function(portal) {
+            // not in origin.portal => we should follow it
             if (origin.portal.indexOf(portal) < 0) {
                 console.log("following", portal)
                 origin.portal.push(portal)
@@ -178,20 +179,22 @@ function processJSON(key, contents) {
 function getPortalChanges(state, currentPortals) {
     var portals = {removed: [], added: []}
     var removed = []
+    // we should unfollow a portal if it was in state.portal but isn't in currentPortals anymore
     state.portal.forEach(function(portal) {
-        // portal has been removed if it was in state.portal yet isn't in currentPortals
         var index = currentPortals.indexOf(portal)
         if (index < 0) {
             removed.push(state.portal.indexOf(portal))
             portals.removed.push(portal)
         }
     })
-    removed.reverse()
+
     // remove from the state in reverse order, so the indexes aren't affected
+    removed.reverse()
     for (var index in removed) {
         state.portal.splice(index, 1)
     }
-    // portal has been added if it isn't in state.portal, but is in currentPortals
+
+    // we should follow a portal if it isn't in state.portal, but is in currentPortals
     currentPortals.forEach(function(portal) {
         // portal has been removed if it was in state.portal yet isn't in currentPortals
         var index = state.portal.indexOf(portal)
