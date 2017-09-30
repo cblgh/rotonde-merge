@@ -64,6 +64,17 @@ path.stat(config.statePath).catch(function(err) {
 .then(function() {
     return getJSON(config.statePath)
 })
+.catch(function(err) {
+    console.log("error with state.json, creating a new one")
+    console.error(err)
+    return new Promise(function(resolve, reject) {
+        createStateFile(config.statePath).then(function() {
+            return getJSON(config.statePath)
+        }).then(function(stateData) {
+            resolve(stateData)
+        })
+    })
+})
 .then(function(stateData) {
     savedState = stateData
     return getJSON(config.originPath)
@@ -251,6 +262,7 @@ function saveJSON(data, filepath) {
 
 // read a file and return it as JSON
 function getJSON(filepath) {
+    console.log(filepath)
     return new Promise(function(resolve, reject) {
         fs.readFile(filepath)
         .then(function(data) {
